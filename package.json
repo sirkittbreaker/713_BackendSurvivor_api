@@ -24,6 +24,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "@prisma/extension-accelerate": "^1.2.2",
+    "713_backendsurvivor_api": "file:",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   }
