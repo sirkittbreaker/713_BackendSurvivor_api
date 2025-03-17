@@ -3,6 +3,8 @@
  * Provides secure password handling with bcrypt
  */
 import bcrypt from "bcrypt";
+import * as repo from "../repositories/authRepository";
+import * as jwt from "jsonwebtoken";
 
 /**
  * Salt rounds for bcrypt - balances security and performance
@@ -14,8 +16,8 @@ const saltRounds = 10;
  * @param password - Plain text password
  * @returns Hashed password
  */
-export async function hashPassword(password: string) {
-  return await bcrypt.hash(password, saltRounds);
+export function hashPassword(password: string) {
+  return bcrypt.hash(password, saltRounds);
 }
 
 /**
@@ -24,6 +26,25 @@ export async function hashPassword(password: string) {
  * @param hash - Stored password hash
  * @returns Boolean indicating if password matches
  */
-export async function comparePassword(password: string, hash: string) {
-  return await bcrypt.compare(password, hash);
+export function comparePassword(password: string, hash: string) {
+  return bcrypt.compare(password, hash);
+}
+
+export function generateToken(userId: number) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "4h" });
+}
+
+export async function getUserFromToken(token: string) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+  return await repo.findUserById(decoded.userId);
+}
+
+export async function findUserByUsername(username: string) {
+  return await repo.findUserByUsername(username);
 }
