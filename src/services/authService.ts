@@ -48,3 +48,43 @@ export async function getUserFromToken(token: string) {
 export async function findUserByUsername(username: string) {
   return await repo.findUserByUsername(username);
 }
+
+export async function registerTeacher(
+  username: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  academicPositionId: number,
+  departmentId: number,
+  profile?: string
+) {
+  const hashedPassword = await hashPassword(password);
+  return await repo.createTeacher(
+    username,
+    hashedPassword,
+    firstName,
+    lastName,
+    academicPositionId,
+    departmentId,
+    profile
+  );
+}
+
+export async function registerStudent(
+  studentId: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  departmentId: number,
+  profile?: string
+) {
+  const hashedPassword = await hashPassword(password);
+  return await repo.createStudent(
+    studentId,
+    hashedPassword,
+    firstName,
+    lastName,
+    departmentId,
+    profile
+  );
+}
