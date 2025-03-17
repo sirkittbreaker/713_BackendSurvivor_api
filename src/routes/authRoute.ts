@@ -7,9 +7,15 @@ import * as authService from "../services/authService";
 import * as authMiddleware from "../middlewares/authMiddleware";
 import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import { UserRole } from "../models/user";
+import multer from "multer";
+import { uploadFile } from "../services/uploadFileService";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Initialize router
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * User Authentication
@@ -54,9 +60,9 @@ router.post("/authenticate", async (req, res) => {
         role: user.role,
       },
     });
-  } catch (error: any) {
-    console.error("❌ Login error:", error.message || error);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (error) {
+    console.error("❌", error);
+    res.status(500).json({ message: "Internal server error" });
   } finally {
     console.log(`✅ Auth attempt: user=${username}, status=${res.statusCode}`);
   }
@@ -84,7 +90,7 @@ router.get("/me", authMiddleware.jwtVerify, async (req, res) => {
     });
   } catch (error) {
     console.error("❌", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   } finally {
     console.log(`✅ Profile access: status=${res.statusCode}`);
   }
@@ -108,12 +114,119 @@ router.get(
       });
     } catch (error) {
       console.error("❌", error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ message: "Internal server error" });
     } finally {
       console.log(`✅ Admin access: status=${res.statusCode}`);
     }
   }
 );
+
+router.post(
+  "/registerTeacher",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  upload.single("profile"),
+  async (req, res) => {
+    const {
+      username,
+      password,
+      firstName,
+      lastName,
+      academicPositionId,
+      departmentId,
+    } = req.body;
+    if (
+      !username ||
+      !password ||
+      !firstName ||
+      !lastName ||
+      !academicPositionId ||
+      !departmentId
+    ) {
+      res.status(400).json({ message: "All fields are required" });
+      return;
+    }
+    try {
+      let profileUrl: string | undefined;
+
+      // Only attempt file upload if a file was provided
+      if (req.file) {
+        const bucket = process.env.SUPABASE_BUCKET_NAME;
+        const filePath = process.env.UPLOAD_DIR;
+
+        if (!bucket || !filePath) {
+          res.status(500).send("Bucket name or file path not configured.");
+          return;
+        }
+
+        // Upload the file and get the URL
+        profileUrl = await uploadFile(bucket, filePath, req.file);
+      }
+
+      // Register the teacher with the profile URL if available
+      const teacher = await authService.registerTeacher(
+        username,
+        password,
+        firstName,
+        lastName,
+        parseInt(academicPositionId),
+        parseInt(departmentId),
+        profileUrl
+      );
+      res.status(201).json(teacher);
+    } catch (error) {
+      console.error("❌", error);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      console.log(
+        `✅ Request completed at /registerTeacher route with POST method with username: ${username}, firstName: ${firstName}, lastName: ${lastName}, academicPositionId: ${academicPositionId}, departmentId: ${departmentId}`
+      );
+    }
+  }
+);
+
+router.post("/registerStudent", upload.single("profile"), async (req, res) => {
+  const { username, password, firstName, lastName, departmentId } = req.body;
+  if (!username || !password || !firstName || !lastName || !departmentId) {
+    res.status(400).json({ message: "All fields are required" });
+    return;
+  }
+  try {
+    let profileUrl: string | undefined;
+
+    // Only attempt file upload if a file was provided
+    if (req.file) {
+      const bucket = process.env.SUPABASE_BUCKET_NAME;
+      const filePath = process.env.UPLOAD_DIR;
+
+      if (!bucket || !filePath) {
+        res.status(500).send("Bucket name or file path not configured.");
+        return;
+      }
+
+      // Upload the file and get the URL
+      profileUrl = await uploadFile(bucket, filePath, req.file);
+    }
+
+    // Register the student with the profile URL if available
+    const student = await authService.registerStudent(
+      username,
+      password,
+      firstName,
+      lastName,
+      parseInt(departmentId),
+      profileUrl
+    );
+    res.status(201).json(student);
+  } catch (error) {
+    console.error("❌", error);
+    res.status(500).json({ message: "Internal server error" });
+  } finally {
+    console.log(
+      `✅ Request completed at /registerStudent route with POST method with username: ${username}, firstName: ${firstName}, lastName: ${lastName}, departmentId: ${departmentId}`
+    );
+  }
+});
 
 // Export router
 export default router;
