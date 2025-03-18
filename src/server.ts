@@ -1,11 +1,19 @@
 import express, { Request, Response } from "express";
 import authRoute from "./routes/authRoute";
+import teacherRoute from "./routes/teacherRoute";
+import studentRoute from "./routes/studentRoute";
+import appointmentRoute from "./routes/appointmentRoute";
+
 
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use("/auth", authRoute);
+app.use('/api/v1/admin/students', studentRoute);
+app.use('/api/v1/admin/teachers', teacherRoute);
+app.use('/api/v1/admin/appointments', appointmentRoute);
+
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
