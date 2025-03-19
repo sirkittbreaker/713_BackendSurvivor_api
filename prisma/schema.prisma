@@ -110,15 +110,17 @@ model Announcement {
 }
 
 model Appointment {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  date      DateTime
-  isAccepted Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  teacherId Int
-  teacher   Teacher  @relation(fields: [teacherId], references: [id])
-  studentId String
-  student   Student  @relation(fields: [studentId], references: [studentId])
+  id            Int       @id @default(autoincrement())
+  title         String
+  content       String?
+  requestedTime DateTime
+  finalTime     DateTime?
+  status        String    @default("PENDING") // or RESCHEDULED, CONFIMRED, CANCELLED
+  isAccepted    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  teacherId     Int
+  teacher       Teacher   @relation(fields: [teacherId], references: [id])
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [studentId])
 }

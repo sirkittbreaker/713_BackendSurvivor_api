@@ -5,7 +5,9 @@ export interface Appointment {
     id: number;
     title: string;
     content: string;
-    date: Date;
+    requestedTime: Date;
+    finalTime?: Date;
+    status: string;
     isAccepted: boolean;
     studentId: string;
     student: Student;

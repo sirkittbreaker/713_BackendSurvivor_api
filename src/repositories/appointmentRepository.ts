@@ -13,7 +13,9 @@ export async function getAllAppointmentsPagination(
     take: pageSize,
     select: {
       id: true,
-      date: true,
+      requestedTime: true,
+      finalTime: true,
+      status: true,
       isAccepted: true,
       student: {
         select: {
