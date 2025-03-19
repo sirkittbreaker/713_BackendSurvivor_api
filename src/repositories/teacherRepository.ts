@@ -27,7 +27,9 @@ export async function getAllTeachersPagination(
       Appointment: {
         select: {
           id: true,
-          date: true,
+          requestedTime: true,
+          finalTime: true,
+          status: true,
           isAccepted: true,
           student: {
             select: {

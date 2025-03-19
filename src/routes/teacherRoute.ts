@@ -23,7 +23,7 @@ router.get("/all", authMiddleware.jwtVerify, permissionMiddleware.checkPermissio
       }
       res.setHeader("x-total-count", result.teachers.total.toString());
       res.setHeader("Access-Control-Expose-Headers", "x-total-count");
-      res.json(result.teachers);
+      res.json(result.teachers.data);
     } catch (error) {
         res.status(500).send("Internal server error");
     } finally {

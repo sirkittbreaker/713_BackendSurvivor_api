@@ -7,7 +7,7 @@ export async function createAppointments() {
         data: {
             title: "thesis update",
             content: "change the thesis topic",
-            date: new Date("2022-01-01"),
+            requestedTime: new Date("2022-01-01"),
             studentId: "679999999",
             teacherId: 1,
         },
