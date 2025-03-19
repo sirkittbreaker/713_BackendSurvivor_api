@@ -14,3 +14,8 @@ export interface Student {
   teacherId?: number;
   teacher?: Teacher;
 }
+
+export interface StudentPagination {
+  count: number;
+  students: Student[];
+}
