@@ -47,3 +47,21 @@ export async function getAllStudentsPagination(
 }
 
 
+export async function getAllStudentsByTeacherId(teacherId: number) {
+  const students = await prisma.student.findMany({
+    where: {
+      teacherId,
+    },
+    select: {
+      studentId: true,
+      firstName: true,
+      lastName: true,
+      department: {
+        select: {
+          name: true,
+        },
+      }
+    },
+  });
+  return students;
+}

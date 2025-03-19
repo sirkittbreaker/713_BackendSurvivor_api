@@ -7,3 +7,8 @@ export async function getAllTeachersPagination(
     const pageTeachers = await repo.getAllTeachersPagination(pageNo, pageSize);
     return pageTeachers;
 }
+
+export async function findTeacherByUserId(userId: number) {
+    const teacher = await repo.findTeacherByUserId(userId);
+    return teacher;
+}

@@ -1,5 +1,6 @@
 import express from "express";
 import * as studentService from "../services/studentService";
+import * as teacherService from "../services/teacherService";
 import * as authMiddleware from "../middlewares/authMiddleware";
 import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import { UserRole } from "../models/user";
@@ -36,5 +37,31 @@ router.get("/all", authMiddleware.jwtVerify, permissionMiddleware.checkPermissio
     console.log(`Request completed with pageNo: ${pageNo}, pageSize: ${pageSize}`);
   }
 });
+
+
+// Route for getting all students by teacherId (teacher only)
+router.get("/byteacher", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.TEACHER),async (req, res) => {
+  const teacherUserId = req.body.user.id;
+  const teacher = await teacherService.findTeacherByUserId(teacherUserId);
+  if (!teacher) {
+    res.status(404).send("Teacher not found");
+    return;
+  }
+
+  try {
+    const students = await studentService.getAllStudentsByTeacherId(teacher.id);
+    if (students.length === 0) {
+      res.status(404).send("No student found");
+      return;
+    }
+    res.json(students);
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  } finally {
+    console.log(`Request completed with teacherId: ${teacher.id}`);
+  }
+}
+);
+
 
 export default router;
