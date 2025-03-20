@@ -24,8 +24,15 @@ export async function getAllStudentsPagination(
       studentId: true,
       firstName: true,
       lastName: true,
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
       department: {
         select: {
+          id: true,
           name: true,
         },
       },
