@@ -14,8 +14,15 @@ export async function getAllTeachersPagination(
       id: true,
       firstName: true,
       lastName: true,
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
       academicPosition: {
         select: {
+          id: true,
           title: true,
         },
       },
