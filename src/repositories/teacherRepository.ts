@@ -72,8 +72,7 @@ export async function getAllTeachersPagination(
   };
 }
 
-
-export async function findTeacherByUserId( userId: number) {
+export async function findTeacherByUserId(userId: number) {
   const teacher = await prisma.teacher.findFirst({
     where: {
       userId,
@@ -92,3 +91,62 @@ export async function findTeacherByUserId( userId: number) {
   return teacher;
 }
 
+export async function getTeacherByStudentId(studentId: string) {
+  const teacher = await prisma.teacher.findFirst({
+    where: {
+      students: {
+        some: {
+          studentId: studentId,
+        },
+      },
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      academicPosition: {
+        select: {
+          title: true,
+        },
+      },
+      department: {
+        select: {
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
+    },
+  });
+  return teacher;
+}
+
+
+export async function getTeacherByDepartmentId(departmentId: number) {
+  const teachers = await prisma.teacher.findMany({
+    where: {
+      departmentId,
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      academicPosition: {
+        select: {
+          title: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
+    },
+  });
+  return teachers;
+}

@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
 // Function to get all appointments with pagination (admin only)
 export async function getAllAppointmentsPagination(
   pageNo: number,
@@ -43,7 +42,6 @@ export async function getAllAppointmentsPagination(
   return { appointments, count };
 }
 
-
 export async function updateAppointmentStatus(
   appointmentId: number,
   status: string
@@ -60,10 +58,7 @@ export async function updateAppointmentStatus(
   return appointment;
 }
 
-export async function updateFinalTime(
-  appointmentId: number,
-  finalTime: Date
-) {
+export async function updateFinalTime(appointmentId: number, finalTime: Date) {
   const appointment = await prisma.appointment.update({
     where: {
       id: appointmentId,
@@ -89,3 +84,46 @@ export async function findRequestedById(appointmentId: number) {
   return appointment;
 }
 
+// Function to add an appointment (student only)
+export async function addAppointment(
+  requestedTime: Date,
+  studentId: string,
+  teacherId: number,
+  title: string,
+  content: string
+) {
+  const appointment = await prisma.appointment.create({
+    data: {
+      requestedTime: requestedTime,
+      title: title,
+      content: content,
+      student: {
+        connect: {
+          studentId: studentId,
+        },
+      },
+      teacher: {
+        connect: {
+          id: teacherId,
+        },
+      },
+    },
+  });
+
+  return appointment;
+}
+
+
+// Function to confirm an appointment (student only)
+export async function confirmAppointment(appointmentId: number) {
+  const appointment = await prisma.appointment.update({
+    where: {
+      id: appointmentId,
+    },
+    data: {
+      isAccepted: true,
+    },
+  });
+
+  return appointment;
+}

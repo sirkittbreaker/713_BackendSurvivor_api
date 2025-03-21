@@ -8,3 +8,13 @@ export async function addComment(
   const newComment = await repo.addComment(teacherId, studentId, content);
   return newComment;
 }
+
+export async function addReply(
+  commentId: number,
+  studentId: string,
+  teacherId: number,
+  content: string,
+) {
+  const newReply = await repo.addReply(commentId, studentId, teacherId, content);
+  return newReply;
+}
