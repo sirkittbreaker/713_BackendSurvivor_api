@@ -71,3 +71,24 @@ export async function getAllTeachersPagination(
     },
   };
 }
+
+
+export async function findTeacherByUserId( userId: number) {
+  const teacher = await prisma.teacher.findFirst({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      academicPosition: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+  return teacher;
+}
+

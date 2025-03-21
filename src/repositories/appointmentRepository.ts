@@ -42,3 +42,50 @@ export async function getAllAppointmentsPagination(
 
   return { appointments, count };
 }
+
+
+export async function updateAppointmentStatus(
+  appointmentId: number,
+  status: string
+) {
+  const appointment = await prisma.appointment.update({
+    where: {
+      id: appointmentId,
+    },
+    data: {
+      status: status,
+    },
+  });
+
+  return appointment;
+}
+
+export async function updateFinalTime(
+  appointmentId: number,
+  finalTime: Date
+) {
+  const appointment = await prisma.appointment.update({
+    where: {
+      id: appointmentId,
+    },
+    data: {
+      finalTime: finalTime,
+    },
+  });
+
+  return appointment;
+}
+
+export async function findRequestedById(appointmentId: number) {
+  const appointment = await prisma.appointment.findUnique({
+    where: {
+      id: appointmentId,
+    },
+    select: {
+      requestedTime: true,
+    },
+  });
+
+  return appointment;
+}
+

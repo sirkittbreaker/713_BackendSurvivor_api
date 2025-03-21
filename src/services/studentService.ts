@@ -8,3 +8,8 @@ export async function getAllStudentsPagination(
     const pageStudents = await repo.getAllStudentsPagination(keyword, pageNo, pageSize);
     return pageStudents;
 }
+
+export async function getAllStudentsByTeacherId(teacherId: number) {
+    const students = await repo.getAllStudentsByTeacherId(teacherId);
+    return students;
+}
