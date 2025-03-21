@@ -16,3 +16,20 @@ export async function addComment(
   });
   return comment;
 }
+
+export async function addReply(
+  commentId: number,
+  studentId: string,
+  teacherId: number,
+  content: string
+) {
+  const reply = await prisma.comment.create({
+    data: {
+      parentId: commentId,
+      studentId: studentId,
+      content: content,
+      teacherId: teacherId,
+    },
+  });
+  return reply;
+}

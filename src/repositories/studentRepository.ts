@@ -72,3 +72,23 @@ export async function getAllStudentsByTeacherId(teacherId: number) {
   });
   return students;
 }
+
+export async function findStudentByUserId(userId: number) {
+  const student = await prisma.student.findFirst({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+      studentId: true,
+      firstName: true,
+      lastName: true,
+      department: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  return student;
+}

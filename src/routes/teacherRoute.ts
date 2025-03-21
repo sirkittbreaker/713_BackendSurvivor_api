@@ -1,8 +1,10 @@
 import express from "express";
 import * as teacherService from "../services/teacherService";
+import * as studentService from "../services/studentService";
 import * as authMiddleware from "../middlewares/authMiddleware";
 import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import { UserRole } from "../models/user";
+import { get } from "http";
 const router = express.Router();
 
 // Route for getting all teachers with pagination (admin only)
@@ -30,5 +32,50 @@ router.get("/all", authMiddleware.jwtVerify, permissionMiddleware.checkPermissio
       console.log(`Request completed with pageNo: ${pageNo}, pageSize: ${pageSize}`);
     }
   });
+
+
+  router.get("/my-teacher", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.STUDENT),async (req, res) => {
+    const studentUserId = req.body.user.id;
+    const student = await studentService.findStudentByUserId(studentUserId);
+    if (!student) {
+      res.status(404).send("Student not found");
+      return;
+    }
+    try {
+      const teacher = await teacherService.getTeacherByStudentId(student.studentId);
+      if (!teacher) {
+        res.status(404).send("No teacher found");
+        return;
+      }
+      res.json(teacher);
+    } catch (error) {
+      res.status(500).send("Internal server error");
+    } finally {
+      console.log(`Request completed with studentId: ${student.id}`);
+    }
+  })
+
+
+  router.get("/department/:id", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.ADMIN),async (req, res) => {
+    const departmentId = parseInt(req.params.id);
+    if (!departmentId) {
+      res.status(400).send("Invalid departmentId");
+      return;
+    }
+    try {
+      const teachers = await teacherService.getTeacherByDepartmentId(departmentId);
+      if (teachers.length === 0) {
+        res.status(404).send("No teacher found");
+        return;
+      }
+      res.json(teachers);
+    } catch (error) {
+      res.status(500).send("Internal server error");
+    } finally {
+      console.log(`Request completed with departmentId: ${departmentId}`);
+    }
+  })
+
   
+
 export default router;  

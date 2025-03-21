@@ -1,5 +1,7 @@
 import express from "express";
 import * as appointmentService from "../services/appointmentService";
+import * as studentService from "../services/studentService";
+import * as teacherService from "../services/teacherService";
 import * as authMiddleware from "../middlewares/authMiddleware";
 import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import { UserRole } from "../models/user";
@@ -110,6 +112,93 @@ router.put(
   "/:id/teacher-cancel",
   authMiddleware.jwtVerify,
   permissionMiddleware.checkPermission(UserRole.TEACHER),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const updatedAppointment =
+        await appointmentService.updateAppointmentStatus(
+          parseInt(id),
+          "CANCELED"
+        );
+      res.json(updatedAppointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel appointment" });
+    }
+  }
+);
+
+
+// Route for creating a new appointment (student only)
+router.post(
+  "/new-appointment",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission(UserRole.STUDENT),
+  async (req, res) => {
+    const { requestedTime, title, content } = req.body;
+    const student = await studentService.findStudentByUserId(req.body.user.id);
+    if (!student) {
+      res.status(404).json({ error: "Student not found" });
+      return;
+    }
+    const studentId = student.studentId;
+
+    const teacher = await teacherService.getTeacherByStudentId(studentId);
+    if (!teacher) {
+      res.status(404).json({ error: "Teacher not found" });
+      return;
+    }
+    const teacherId = teacher.id;
+    try {
+      const newAppointment = await appointmentService.addAppointment(
+        requestedTime,
+        studentId,
+        teacherId,
+        title,
+        content
+      );
+      res.json(newAppointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create appointment" });
+    } finally {
+      console.log(
+        `Request completed with studentId: ${studentId} with title ${title}`
+      );
+    }
+  }
+);
+
+
+// Route for getting all appointments for a student (student only)
+router.put(
+  "/:id/student-confirm",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission(UserRole.STUDENT),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const updatedAppointment =
+        await appointmentService.updateAppointmentStatus(
+          parseInt(id),
+          "CONFIRMED"
+        );
+      const confirmedAppointment = await appointmentService.confirmAppointment(
+        parseInt(id)
+      );
+      res.json(confirmedAppointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to confirm appointment" });
+    } finally {
+      console.log(`Request completed with appointmentId: ${id}`);
+    }
+  }
+);
+
+
+// Route for canceling an appointment (student only)
+router.put(
+  "/:id/student-cancel",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission(UserRole.STUDENT),
   async (req, res) => {
     const { id } = req.params;
     try {

@@ -13,3 +13,9 @@ export async function getAllStudentsByTeacherId(teacherId: number) {
     const students = await repo.getAllStudentsByTeacherId(teacherId);
     return students;
 }
+
+export async function findStudentByUserId(userId: number) {
+    const student = await repo.findStudentByUserId(userId);
+    return student;
+}
+
