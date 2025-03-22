@@ -22,3 +22,8 @@ export async function getTeacherByDepartmentId(departmentId: number) {
     const teacher = await repo.getTeacherByDepartmentId(departmentId);
     return teacher;
 }
+
+export async function updateTeacherById(teacherId: number, data: any) {
+    const updatedTeacher = await repo.updateTeacherById(teacherId, data);
+    return updatedTeacher;
+}

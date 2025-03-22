@@ -150,3 +150,15 @@ export async function getTeacherByDepartmentId(departmentId: number) {
   });
   return teachers;
 }
+
+export async function updateTeacherById(teacherId: number, data: any) {
+  const teacher = await prisma.teacher.update({
+    where: {
+      id: teacherId,
+    },
+    data: {
+      ...data,
+    },
+  });
+  return teacher;
+}

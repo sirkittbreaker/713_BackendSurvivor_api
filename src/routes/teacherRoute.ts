@@ -76,6 +76,20 @@ router.get("/all", authMiddleware.jwtVerify, permissionMiddleware.checkPermissio
     }
   })
 
-  
+  router.put("/:id/update", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.ADMIN),async (req, res) => {
+    const teacherId = parseInt(req.params.id);
+    if (!teacherId) {
+      res.status(400).send("Invalid teacherId");
+      return;
+    }
+    const { firstName, lastName, academicPositionId,departmentId } = req.body;
+    try {
+      const updatedTeacher = await teacherService.updateTeacherById(teacherId, { firstName ,lastName,academicPositionId ,departmentId });
+      res.json(updatedTeacher);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("Internal server error");
+    }
+  })
 
 export default router;  
