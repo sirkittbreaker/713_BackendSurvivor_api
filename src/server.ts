@@ -30,9 +30,6 @@ app.use('/api/v1/teachers', teacherRoute);
 app.use('/api/v1/appointments', appointmentRoute);
 app.use('/api/v1/comments', commentRoute);
 app.use('/api/v1/announcements', announcementRoute);
-app.use("/api/v1/students", studentRoute);
-app.use("/api/v1/teachers", teacherRoute);
-app.use("/api/v1/appointments", appointmentRoute);
 app.use("/api/v1/departments", departmentRoute);
 app.use("/api/v1/academic-positions", academicPositionRoute);
 
