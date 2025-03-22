@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { UserRole } from "../models/user";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,12 @@ export async function getAllTeachersPagination(
         select: {
           id: true,
           title: true,
+        },
+      },
+      department: {
+        select: {
+          id: true,
+          name: true,
         },
       },
       _count: {
@@ -160,5 +167,38 @@ export async function updateTeacherById(teacherId: number, data: any) {
       ...data,
     },
   });
+  return teacher;
+}
+
+
+export async function addTeacher(
+  firstName: string,
+  lastName: string,
+  academicPositionId: number,
+  departmentId: number,
+  username: string,
+  password: string,
+  profile?: string
+) {
+  const user = await prisma.user.create({
+    data: {
+      role: UserRole.TEACHER,
+      username,
+      password,
+      profile,
+    },
+  });
+
+  const teacher = await prisma.teacher.create({
+    data: {
+      firstName,
+      lastName,
+      academicPositionId,
+      departmentId,
+      userId: user.id,
+    },
+  });
+
+  
   return teacher;
 }
