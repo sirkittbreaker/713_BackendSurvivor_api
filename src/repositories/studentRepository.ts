@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
 // Function to get all students with pagination (admin only)
 export async function getAllStudentsPagination(
   keyword: string,
@@ -38,6 +37,7 @@ export async function getAllStudentsPagination(
       },
       teacher: {
         select: {
+          id: true,
           firstName: true,
           lastName: true,
           academicPosition: {
@@ -53,7 +53,6 @@ export async function getAllStudentsPagination(
   return { students, count };
 }
 
-
 export async function getAllStudentsByTeacherId(teacherId: number) {
   const students = await prisma.student.findMany({
     where: {
@@ -67,7 +66,7 @@ export async function getAllStudentsByTeacherId(teacherId: number) {
         select: {
           name: true,
         },
-      }
+      },
     },
   });
   return students;
@@ -88,6 +87,18 @@ export async function findStudentByUserId(userId: number) {
           name: true,
         },
       },
+    },
+  });
+  return student;
+}
+
+export async function updateTeacherId(studentId: string, teacherId: number) {
+  const student = await prisma.student.update({
+    where: {
+      studentId,
+    },
+    data: {
+      teacherId,
     },
   });
   return student;
