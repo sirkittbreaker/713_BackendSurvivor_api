@@ -25,9 +25,99 @@ export async function findUserByUsername(username: string) {
  * @returns User object or null if not found
  */
 export async function findUserById(id: number) {
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id },
+    select: {
+      id: true,
+      username: true,
+      password: true,
+      role: true,
+      profile: true,
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          department: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          academicPosition: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      },
+      student: {
+        select: {
+          id: true,
+          studentId: true,
+          firstName: true,
+          lastName: true,
+          department: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              academicPosition: {
+                select: {
+                  id: true,
+                  title: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
+
+  if (!user) return null;
+
+  // Return data based on role
+  switch (user.role) {
+    case "ROLE_ADMIN":
+      return {
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        role: user.role,
+        profile: user.profile,
+      };
+
+    case "ROLE_TEACHER":
+      return {
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        role: user.role,
+        profile: user.profile,
+        teacher: user.teacher,
+      };
+
+    case "ROLE_STUDENT":
+      return {
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        role: user.role,
+        profile: user.profile,
+        student: user.student,
+      };
+
+    default:
+      return user;
+  }
 }
 
 export async function createTeacher(

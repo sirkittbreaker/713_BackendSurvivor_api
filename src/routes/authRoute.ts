@@ -77,16 +77,13 @@ router.get("/me", authMiddleware.jwtVerify, async (req, res) => {
   try {
     // Get authenticated user from middleware
     const user = req.body.user;
+    // Remove password from user object before sending
+    const { password: _, ...userWithoutPassword } = user;
 
     // Return user profile data
     res.status(200).json({
       status: "success",
-      user: {
-        id: user.id,
-        username: user.username,
-        profile: user.profile,
-        role: user.role,
-      },
+      user: userWithoutPassword,
     });
   } catch (error) {
     console.error("❌", error);
