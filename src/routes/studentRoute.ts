@@ -69,5 +69,27 @@ router.get("/byteacher", authMiddleware.jwtVerify, permissionMiddleware.checkPer
 );
 
 
+// Route for getting all students by teacherId (admin only)
+router.get("/teacher/:id", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.ADMIN),async (req, res) => {
+  const teacherId = parseInt(req.params.id);
+  if (!teacherId) {
+    res.status(400).send("Invalid teacherId");
+    return;
+  }
+  try {
+    const students = await studentService.getAllStudentsByTeacherId(teacherId);
+    if (students.length === 0) {
+      res.status(404).send("No student found");
+      return;
+    }
+    res.json(students);
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  } finally {
+    console.log(`Request completed with teacherId: ${teacherId}`);
+  }
+});
+
+
 export default router;
 
