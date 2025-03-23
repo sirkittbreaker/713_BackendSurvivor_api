@@ -119,7 +119,7 @@ router.get(
 );
 
 router.post(
-  "/registerTeacher",
+  "/register-teacher",
   authMiddleware.jwtVerify,
   permissionMiddleware.checkPermission([UserRole.ADMIN]),
   upload.single("profile"),
@@ -182,7 +182,7 @@ router.post(
   }
 );
 
-router.post("/registerStudent", upload.single("profile"), async (req, res) => {
+router.post("/register-student", upload.single("profile"), async (req, res) => {
   const { username, password, firstName, lastName, departmentId } = req.body;
   if (!username || !password || !firstName || !lastName || !departmentId) {
     res.status(400).json({ message: "All fields are required" });
