@@ -10,7 +10,7 @@ const router = express.Router();
 router.get(
   "/all",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  permissionMiddleware.checkPermission([UserRole.ADMIN]),
   async (req, res) => {
     const keyword = (req.query.keyword as string) || "";
     const pageSize = parseInt(req.query.pageSize as string) || 3;
@@ -48,7 +48,7 @@ router.get(
 router.get(
   "/byteacher",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   async (req, res) => {
     const teacherUserId = req.body.user.id;
     const teacher = await teacherService.findTeacherByUserId(teacherUserId);
@@ -78,7 +78,7 @@ router.get(
 router.put(
   "/update-teacher",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  permissionMiddleware.checkPermission([UserRole.ADMIN]),
   async (req, res) => {
     const studentId = req.body.studentId as string;
     const teacherId = parseInt(req.body.teacherId as string);
@@ -99,25 +99,31 @@ router.put(
 );
 
 // Route for getting all students by teacherId (admin only)
-router.get("/teacher/:id", authMiddleware.jwtVerify, permissionMiddleware.checkPermission(UserRole.ADMIN),async (req, res) => {
-  const teacherId = parseInt(req.params.id);
-  if (!teacherId) {
-    res.status(400).send("Invalid teacherId");
-    return;
-  }
-  try {
-    const students = await studentService.getAllStudentsByTeacherId(teacherId);
-    if (students.length === 0) {
-      res.status(404).send("No student found");
+router.get(
+  "/teacher/:id",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.ADMIN, UserRole.TEACHER]),
+  async (req, res) => {
+    const teacherId = parseInt(req.params.id);
+    if (!teacherId) {
+      res.status(400).send("Invalid teacherId");
       return;
     }
-    res.json(students);
-  } catch (error) {
-    res.status(500).send("Internal server error");
-  } finally {
-    console.log(`Request completed with teacherId: ${teacherId}`);
+    try {
+      const students = await studentService.getAllStudentsByTeacherId(
+        teacherId
+      );
+      if (students.length === 0) {
+        res.status(404).send("No student found");
+        return;
+      }
+      res.json(students);
+    } catch (error) {
+      res.status(500).send("Internal server error");
+    } finally {
+      console.log(`Request completed with teacherId: ${teacherId}`);
+    }
   }
-});
-
+);
 
 export default router;

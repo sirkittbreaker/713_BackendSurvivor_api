@@ -33,3 +33,79 @@ export async function addReply(
   });
   return reply;
 }
+
+export async function getTeacherComments(teacherId: number, studentId: string) {
+  return prisma.comment.findMany({
+    where: {
+      teacherId,
+      studentId,
+      parentId: null, // Get only parent comments (not replies)
+    },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
+      student: {
+        select: {
+          studentId: true,
+          firstName: true,
+          lastName: true,
+          department: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      replies: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              academicPosition: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
+          student: {
+            select: {
+              studentId: true,
+              firstName: true,
+              lastName: true,
+              department: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}

@@ -13,12 +13,11 @@ dotenv.config();
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-
 // Route for getting announcements by teacher (teacher only)
 router.get(
   "/byteacher",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   async (req, res) => {
     const teacherUserId = req.body.user.id;
     const teacher = await teacherService.findTeacherByUserId(teacherUserId);
@@ -39,12 +38,11 @@ router.get(
   }
 );
 
-
 // Route for uploading an announcement (teacher only)
 router.post(
   "/add",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   upload.single("announcement"),
   async (req, res) => {
     const { title, content, teacherId } = req.body;
