@@ -8,7 +8,7 @@ export async function getAllStudentsPagination(
   pageNo: number,
   pageSize: number
 ) {
-  const where = {
+  const where: any = {
     OR: [
       { studentId: { contains: keyword, mode: "insensitive" } },
       { firstName: { contains: keyword, mode: "insensitive" } },
