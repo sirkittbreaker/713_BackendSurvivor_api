@@ -62,9 +62,28 @@ export async function getAllStudentsByTeacherId(teacherId: number) {
       studentId: true,
       firstName: true,
       lastName: true,
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
       department: {
         select: {
+          id: true,
           name: true,
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
         },
       },
     },
