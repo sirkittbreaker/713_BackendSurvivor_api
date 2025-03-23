@@ -10,5 +10,117 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DIRECT_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      UserRole
+  profile   String? // URL ของรูปโปรไฟล์
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacher Teacher? @relation(name: "UserTeacher")
+  student Student? @relation(name: "UserStudent")
+}
+
+enum UserRole {
+  ROLE_ADMIN
+  ROLE_TEACHER
+  ROLE_STUDENT
+}
+
+model Department {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  teachers  Teacher[]
+  students  Student[]
+}
+
+model AcademicPosition {
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  teachers  Teacher[]
+}
+
+model Teacher {
+  id                 Int              @id @default(autoincrement())
+  userId             Int              @unique
+  user               User             @relation(name: "UserTeacher", fields: [userId], references: [id])
+  firstName          String
+  lastName           String
+  academicPositionId Int
+  academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
+  departmentId       Int
+  department         Department       @relation(fields: [departmentId], references: [id])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  students           Student[]        @relation("TeacherStudent")
+  comments           Comment[]        @relation("TeacherComments")
+  Announcement       Announcement[]
+  Appointment        Appointment[]
+}
+
+model Student {
+  id           Int           @id @default(autoincrement())
+  userId       Int           @unique
+  user         User          @relation(name: "UserStudent", fields: [userId], references: [id])
+  studentId    String        @unique
+  firstName    String
+  lastName     String
+  departmentId Int
+  department   Department    @relation(fields: [departmentId], references: [id])
+  teacherId    Int?
+  teacher      Teacher?      @relation(name: "TeacherStudent", fields: [teacherId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  comments     Comment[]     @relation("StudentComments")
+  Appointment  Appointment[]
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  teacherId Int
+  teacher   Teacher   @relation(fields: [teacherId], references: [id], name: "TeacherComments")
+  studentId String
+  student   Student   @relation(fields: [studentId], references: [studentId], name: "StudentComments")
+  parentId  Int?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  fileUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teacherId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+}
+
+model Appointment {
+  id            Int       @id @default(autoincrement())
+  title         String
+  content       String?
+  requestedTime DateTime
+  finalTime     DateTime?
+  status        String    @default("PENDING") // or RESCHEDULED, CONFIMRED, CANCELLED
+  isAccepted    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  teacherId     Int
+  teacher       Teacher   @relation(fields: [teacherId], references: [id])
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [studentId])
 }

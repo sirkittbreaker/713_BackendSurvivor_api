@@ -53,3 +53,6 @@ lerna-debug.log*
 
 # Optional REPL history
 .node_repl_history
+
+prisma/migrations/
+prisma/migrations/migration_lock.toml
