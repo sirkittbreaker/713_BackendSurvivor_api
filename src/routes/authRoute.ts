@@ -101,7 +101,7 @@ router.get("/me", authMiddleware.jwtVerify, async (req, res) => {
 router.get(
   "/admin",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  permissionMiddleware.checkPermission([UserRole.ADMIN]),
   async (req, res) => {
     try {
       // Return success message for admin
@@ -121,7 +121,7 @@ router.get(
 router.post(
   "/registerTeacher",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  permissionMiddleware.checkPermission([UserRole.ADMIN]),
   upload.single("profile"),
   async (req, res) => {
     const {

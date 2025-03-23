@@ -11,7 +11,7 @@ const router = express.Router();
 router.get(
   "/all",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.ADMIN),
+  permissionMiddleware.checkPermission([UserRole.ADMIN]),
   async (req, res) => {
     const pageSize = parseInt(req.query.pageSize as string) || 3;
     const pageNo = parseInt(req.query.pageNo as string) || 1;
@@ -47,7 +47,7 @@ router.get(
 router.put(
   "/:id/teacher-confirm",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   async (req, res) => {
     const { id } = req.params;
     const requestedTime = await appointmentService.findRequestedTimeById(
@@ -79,7 +79,7 @@ router.put(
 router.put(
   "/:id/teacher-reschedule",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   async (req, res) => {
     const { id } = req.params;
     const { finalTime } = req.body;
@@ -111,7 +111,7 @@ router.put(
 router.put(
   "/:id/teacher-cancel",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.TEACHER),
+  permissionMiddleware.checkPermission([UserRole.TEACHER]),
   async (req, res) => {
     const { id } = req.params;
     try {
@@ -127,12 +127,11 @@ router.put(
   }
 );
 
-
 // Route for creating a new appointment (student only)
 router.post(
   "/new-appointment",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.STUDENT),
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
   async (req, res) => {
     const { requestedTime, title, content } = req.body;
     const student = await studentService.findStudentByUserId(req.body.user.id);
@@ -167,12 +166,11 @@ router.post(
   }
 );
 
-
 // Route for getting all appointments for a student (student only)
 router.put(
   "/:id/student-confirm",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.STUDENT),
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
   async (req, res) => {
     const { id } = req.params;
     try {
@@ -193,12 +191,11 @@ router.put(
   }
 );
 
-
 // Route for canceling an appointment (student only)
 router.put(
   "/:id/student-cancel",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission(UserRole.STUDENT),
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
   async (req, res) => {
     const { id } = req.params;
     try {
