@@ -142,7 +142,6 @@ router.get(
         studentId
       );
       res.json({
-        status: "success",
         data: comments,
       });
     } catch (error) {
