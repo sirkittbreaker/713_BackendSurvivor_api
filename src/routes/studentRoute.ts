@@ -126,4 +126,25 @@ router.get(
   }
 );
 
+router.get(
+  "/:studentId",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.ADMIN, UserRole.TEACHER]),
+  async (req, res) => {
+    const studentId = req.params.studentId;
+    try {
+      const student = await studentService.getStudentByStudentId(studentId);
+      if (!student) {
+        res.status(404).send("Student not found");
+        return;
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).send("Internal server error");
+    } finally {
+      console.log(`Request completed with studentId: ${studentId}`);
+    }
+  }
+);
+
 export default router;
