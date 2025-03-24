@@ -26,3 +26,8 @@ export async function findStudentByUserId(userId: number) {
 export async function updateTeacherId(studentId: string, teacherId: number) {
   await repo.updateTeacherId(studentId, teacherId);
 }
+
+export async function getStudentByStudentId(studentId: string) {
+  const student = await repo.getStudentByStudentId(studentId);
+  return student;
+}
