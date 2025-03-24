@@ -73,7 +73,25 @@ export async function getTeacherComments(teacherId: number, studentId: string) {
               username: true,
               role: true,
             },
-            
+          },
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              academicPosition: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
+          student: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
           },
         },
         orderBy: {
