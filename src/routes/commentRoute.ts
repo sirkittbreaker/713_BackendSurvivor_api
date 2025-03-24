@@ -141,7 +141,7 @@ router.get(
         teacherId,
         studentId
       );
-      res.json({ comments });
+      res.json(comments);
     } catch (error) {
       console.error("❌", error);
       res.status(500).json({ message: "Internal server error" });
