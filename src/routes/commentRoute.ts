@@ -66,7 +66,6 @@ router.post(
     }
 
     try {
-      console.log("Adding reply", commentId, studentId, teacherId, content, userId);
       const newReply = await commentService.addReply(
         commentId,
         studentId,
@@ -154,6 +153,40 @@ router.get(
       res.status(500).json({ message: "Internal server error" });
     } finally {
       console.log(`✅ Teacher comments access: status=${res.statusCode}`);
+    }
+  }
+);
+
+router.get(
+  "/student-teacher",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  async (req, res) => {
+    try {
+      const student = await studentService.findStudentByUserId(
+        req.body.user.id
+      );
+      if (!student) {
+        res.status(404).send("Student not found");
+        return;
+      }
+      const studentId = student.studentId;
+      if (!student.teacherId) {
+        res
+          .status(404)
+          .json({ message: "No teacher assigned to this student" });
+        return;
+      }
+      const comments = await commentService.getTeacherComments(
+        student.teacherId,
+        studentId
+      );
+      res.json(comments);
+    } catch (error) {
+      console.error("❌", error);
+      res.status(500).json({ message: "Internal server error" });
+    } finally {
+      console.log(`✅ Student comments access: status=${res.statusCode}`);
     }
   }
 );

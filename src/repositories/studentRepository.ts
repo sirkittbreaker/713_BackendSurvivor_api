@@ -106,6 +106,7 @@ export async function findStudentByUserId(userId: number) {
           name: true,
         },
       },
+      teacherId: true,
     },
   });
   return student;
