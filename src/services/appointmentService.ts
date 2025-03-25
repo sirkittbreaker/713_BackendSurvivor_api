@@ -1,15 +1,18 @@
-import { title } from "process";
 import * as repo from "../repositories/appointmentRepository";
 
-export async function getAllAppointmentsPagination(
-  pageNo: number,
-  pageSize: number
-) {
-  const pageAppointments = await repo.getAllAppointmentsPagination(
-    pageNo,
-    pageSize
-  );
-  return pageAppointments;
+export async function getAllAppointments() {
+  const appointments = await repo.getAllAppointments();
+  return appointments;
+}
+
+export async function getAppointmentsByStudentId(studentId: string) {
+  const appointments = await repo.getAppointmentsByStudentId(studentId);
+  return appointments;
+}
+
+export async function getAppointmentsByTeacherId(teacherId: number) {
+  const appointments = await repo.getAppointmentsByTeacherId(teacherId);
+  return appointments;
 }
 
 export async function updateAppointmentStatus(
@@ -57,3 +60,4 @@ export async function confirmAppointment(appointmentId: number) {
   const confirmedAppointment = await repo.confirmAppointment(appointmentId);
   return confirmedAppointment;
 }
+
