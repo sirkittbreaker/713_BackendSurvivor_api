@@ -20,6 +20,12 @@ export async function getAllTeachersPagination(
           profile: true,
         },
       },
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       academicPosition: {
         select: {
           id: true,

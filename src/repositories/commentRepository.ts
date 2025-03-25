@@ -5,13 +5,15 @@ const prisma = new PrismaClient();
 export async function addComment(
   teacherId: number,
   studentId: string,
-  content: string
+  content: string,
+  userId: number
 ) {
   const comment = await prisma.comment.create({
     data: {
       teacherId: teacherId,
       studentId: studentId,
       content: content,
+      createdBy: userId,
     },
   });
   return comment;
@@ -21,7 +23,8 @@ export async function addReply(
   commentId: number,
   studentId: string,
   teacherId: number,
-  content: string
+  content: string,
+  userId: number
 ) {
   const reply = await prisma.comment.create({
     data: {
@@ -29,6 +32,8 @@ export async function addReply(
       studentId: studentId,
       content: content,
       teacherId: teacherId,
+      createdBy: userId, // Ensure this field is correctly set to the userId
+      // Removed the incorrect `user` argument
     },
   });
   return reply;
@@ -57,23 +62,18 @@ export async function getTeacherComments(teacherId: number, studentId: string) {
           },
         },
       },
-      student: {
-        select: {
-          studentId: true,
-          firstName: true,
-          lastName: true,
-          department: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
       replies: {
         select: {
           id: true,
           content: true,
           createdAt: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              role: true,
+            },
+          },
           teacher: {
             select: {
               id: true,
@@ -88,14 +88,9 @@ export async function getTeacherComments(teacherId: number, studentId: string) {
           },
           student: {
             select: {
-              studentId: true,
+              id: true,
               firstName: true,
               lastName: true,
-              department: {
-                select: {
-                  name: true,
-                },
-              },
             },
           },
         },

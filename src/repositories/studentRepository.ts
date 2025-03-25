@@ -122,3 +122,41 @@ export async function updateTeacherId(studentId: string, teacherId: number) {
   });
   return student;
 }
+
+export async function getStudentByStudentId(studentId: string) {
+  const student = await prisma.student.findFirst({
+    where: {
+      studentId,
+    },
+    select: {
+      studentId: true,
+      firstName: true,
+      lastName: true,
+      user: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return student;
+}

@@ -21,6 +21,7 @@ router.post(
     const teacherId = teacher.id;
     const studentId = req.body.studentId;
     const content = req.body.content;
+    const userId = req.body.user.id;
 
     if (!studentId || !content) {
       res.status(400).send("Student ID and content are required");
@@ -31,7 +32,8 @@ router.post(
       const newComment = await commentService.addComment(
         teacherId,
         studentId,
-        content
+        content,
+        userId
       );
       res.json(newComment);
     } catch (error) {
@@ -56,6 +58,7 @@ router.post(
     const teacherId = teacher.id;
     const studentId = req.body.studentId;
     const content = req.body.content;
+    const userId = req.body.user.id;
 
     if (!commentId || !content) {
       res.status(400).send("Comment ID and content are required");
@@ -63,11 +66,13 @@ router.post(
     }
 
     try {
+      console.log("Adding reply", commentId, studentId, teacherId, content, userId);
       const newReply = await commentService.addReply(
         commentId,
         studentId,
         teacherId,
-        content
+        content,
+        userId
       );
       res.json(newReply);
     } catch (error) {
@@ -99,6 +104,7 @@ router.post(
     }
     const teacherId = teacher.id;
     const content = req.body.content;
+    const userId = req.body.user.id;
 
     if (!commentId || !content) {
       res.status(400).send("Comment ID and content are required");
@@ -110,7 +116,8 @@ router.post(
         commentId,
         studentId,
         teacherId,
-        content
+        content,
+        userId
       );
       res.json(newReply);
     } catch (error) {
@@ -141,10 +148,7 @@ router.get(
         teacherId,
         studentId
       );
-      res.json({
-        status: "success",
-        data: comments,
-      });
+      res.json(comments);
     } catch (error) {
       console.error("❌", error);
       res.status(500).json({ message: "Internal server error" });
