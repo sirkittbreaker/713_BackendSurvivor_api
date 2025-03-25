@@ -2,14 +2,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Function to get all appointments with pagination (admin only)
-export async function getAllAppointmentsPagination(
-  pageNo: number,
-  pageSize: number
-) {
+export async function getAllAppointments() {
   const appointments = await prisma.appointment.findMany({
-    skip: pageSize * (pageNo - 1),
-    take: pageSize,
     select: {
       id: true,
       requestedTime: true,
@@ -37,10 +31,107 @@ export async function getAllAppointmentsPagination(
       },
     },
   });
-  const count = await prisma.appointment.count();
 
-  return { appointments, count };
+  // Group appointments by status
+  const groupedAppointments = {
+    PENDING: appointments.filter((appointment) => appointment.status === 'PENDING'),
+    CONFIRMED: appointments.filter((appointment) => appointment.status === 'CONFIRMED'),
+    RESCHEDULE: appointments.filter((appointment) => appointment.status === 'RESCHEDULED'),
+    CANCELED: appointments.filter((appointment) => appointment.status === 'CANCELED'),
+  };
+
+  return groupedAppointments;
 }
+
+export async function getAppointmentsByStudentId(studentId: string) {
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      studentId: studentId,
+    },
+    select: {
+      id: true,
+      requestedTime: true,
+      finalTime: true,
+      status: true,
+      isAccepted: true,
+      student: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Group appointments by status
+  const groupedAppointments = {
+    PENDING: appointments.filter((appointment) => appointment.status === 'PENDING'),
+    CONFIRMED: appointments.filter((appointment) => appointment.status === 'CONFIRMED'),
+    RESCHEDULE: appointments.filter((appointment) => appointment.status === 'RESCHEDULED'),
+    CANCELED: appointments.filter((appointment) => appointment.status === 'CANCELED'),
+  };
+
+  return groupedAppointments;
+}
+
+
+export async function getAppointmentsByTeacherId(teacherId: number) {
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      teacherId: teacherId,
+    },
+    select: {
+      id: true,
+      requestedTime: true,
+      finalTime: true,
+      status: true,
+      isAccepted: true,
+      student: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Group appointments by status
+  const groupedAppointments = {
+    PENDING: appointments.filter((appointment) => appointment.status === 'PENDING'),
+    CONFIRMED: appointments.filter((appointment) => appointment.status === 'CONFIRMED'),
+    RESCHEDULE: appointments.filter((appointment) => appointment.status === 'RESCHEDULED'),
+    CANCELED: appointments.filter((appointment) => appointment.status === 'CANCELED'),
+  };
+
+  return groupedAppointments;
+}
+
 
 export async function updateAppointmentStatus(
   appointmentId: number,
@@ -127,3 +218,5 @@ export async function confirmAppointment(appointmentId: number) {
 
   return appointment;
 }
+
+
