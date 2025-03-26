@@ -70,7 +70,7 @@ router.put(
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CONFIRMED"
+          "ยอมรับโดยอาจารย์"
         );
       res.json({ updatedAppointment, updateFinalTime });
     } catch (error) {
@@ -102,31 +102,11 @@ router.put(
       );
       const updatedStatus = await appointmentService.updateAppointmentStatus(
         parseInt(id),
-        "RESCHEDULED"
+        "เสนอเวลานัดหมายใหม่"
       );
       res.json({ updatedStatus });
     } catch (error) {
       res.status(500).json({ error: "Failed to reschedule appointment" });
-    }
-  }
-);
-
-// Route for canceling an appointment (teacher only)
-router.put(
-  "/:id/teacher-cancel",
-  authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission([UserRole.TEACHER]),
-  async (req, res) => {
-    const { id } = req.params;
-    try {
-      const updatedAppointment =
-        await appointmentService.updateAppointmentStatus(
-          parseInt(id),
-          "CANCELED"
-        );
-      res.json(updatedAppointment);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to cancel appointment" });
     }
   }
 );
@@ -181,7 +161,7 @@ router.put(
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CONFIRMED"
+          "ยืนยันการนัดหมาย"
         );
       const confirmedAppointment = await appointmentService.confirmAppointment(
         parseInt(id)
@@ -195,24 +175,44 @@ router.put(
   }
 );
 
-// Route for canceling an appointment (student only)
+// Route for canceling an appointment (student and teacher only)
 router.put(
-  "/:id/student-cancel",
+  "/:id/cancel",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  permissionMiddleware.checkPermission([UserRole.STUDENT, UserRole.TEACHER]),
   async (req, res) => {
     const { id } = req.params;
+    const { role } = req.body.user;
+    if (role === UserRole.STUDENT) {
     try {
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CANCELED"
+          "ยกเลิกโดยนักศึกษา"
         );
       res.json(updatedAppointment);
     } catch (error) {
       res.status(500).json({ error: "Failed to cancel appointment" });
     }
+    return;
   }
+
+  else if (role === UserRole.TEACHER) {
+    try {
+      const updatedAppointment =
+        await appointmentService.updateAppointmentStatus(
+          parseInt(id),
+          "ยกเลิกโดยอาจารย์"
+        );
+      res.json(updatedAppointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel appointment" });
+    }
+    return;
+  }
+}
+
+  
 );
 
 export default router;
