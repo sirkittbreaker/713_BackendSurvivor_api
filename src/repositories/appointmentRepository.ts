@@ -38,7 +38,7 @@ export async function getAllAppointments() {
     ACCEPTED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยอมรับโดยอาจารย์'),
     NEW_DATE_PURPOSED: appointments.filter((appointment) => appointment.status === 'เสนอเวลานัดหมายใหม่'),
     APPOINTMENT_CONFIRMED: appointments.filter((appointment) => appointment.status === 'ยืนยันการนัดหมาย'),
-    CANCELLE_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยอาจารย์'),
+    CANCELLED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยอาจารย์'),
     CANCELLED_BY_STUDENT: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยนักเรียน'),
   };
 
