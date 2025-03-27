@@ -94,17 +94,28 @@ export async function getAppointmentsByTeacherId(teacherId: number) {
     where: {
       teacherId: teacherId,
     },
+    orderBy: {
+      createdAt: 'desc', // Sort appointments by createdAt in descending order (newest to oldest)
+    },
     select: {
       id: true,
+      title: true,
+      content: true,
       requestedTime: true,
       finalTime: true,
       status: true,
       isAccepted: true,
+      createdAt: true,
       student: {
         select: {
           id: true,
           firstName: true,
           lastName: true,
+          user: {
+            select: {
+              profile: true
+            },
+          }
         },
       },
       teacher: {
@@ -122,17 +133,7 @@ export async function getAppointmentsByTeacherId(teacherId: number) {
     },
   });
 
-  // Group appointments by status
-  const groupedAppointments = {
-    AWAITING_RESPONSE: appointments.filter((appointment) => appointment.status === 'รอการตอบรับจากอาจารย์'),
-    ACCEPTED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยอมรับโดยอาจารย์'),
-    NEW_DATE_PURPOSED: appointments.filter((appointment) => appointment.status === 'เสนอเวลานัดหมายใหม่'),
-    APPOINTMENT_CONFIRMED: appointments.filter((appointment) => appointment.status === 'ยืนยันการนัดหมาย'),
-    CANCELLE_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยอาจารย์'),
-    CANCELLED_BY_STUDENT: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยนักเรียน'),
-  };
-
-  return groupedAppointments;
+  return appointments;
 }
 
 
