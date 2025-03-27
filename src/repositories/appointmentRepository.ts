@@ -6,6 +6,8 @@ export async function getAllAppointments() {
   const appointments = await prisma.appointment.findMany({
     select: {
       id: true,
+      title: true,
+      content: true,
       requestedTime: true,
       finalTime: true,
       status: true,
