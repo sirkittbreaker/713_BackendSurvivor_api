@@ -39,7 +39,7 @@ export async function getAllAppointments() {
     NEW_DATE_PURPOSED: appointments.filter((appointment) => appointment.status === 'เสนอเวลานัดหมายใหม่'),
     APPOINTMENT_CONFIRMED: appointments.filter((appointment) => appointment.status === 'ยืนยันการนัดหมาย'),
     CANCELLED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยอาจารย์'),
-    CANCELLED_BY_STUDENT: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยนักเรียน'),
+    CANCELLED_BY_STUDENT: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยนักศึกษา'),
   };
 
   return groupedAppointments;
