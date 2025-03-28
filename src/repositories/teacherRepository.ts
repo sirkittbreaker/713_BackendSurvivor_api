@@ -53,7 +53,7 @@ export async function getAllTeachersPagination(
           },
         },
         orderBy: {
-          id: "asc",
+          createdAt: "desc",
         },
       },
     },

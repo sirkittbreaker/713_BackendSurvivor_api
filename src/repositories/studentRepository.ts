@@ -48,6 +48,9 @@ export async function getAllStudentsPagination(
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   const count = await prisma.student.count({ where });
   return { students, count };
