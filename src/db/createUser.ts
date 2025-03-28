@@ -89,7 +89,7 @@ export async function createUser() {
   await prisma.user.create({
     data: {
       username: "admin",
-      password: await bcrypt.hash("admin", numSaltRounds),
+      password: await bcrypt.hash("admin123", numSaltRounds),
       profile:
         "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_1280.png",
       role: "ROLE_ADMIN",

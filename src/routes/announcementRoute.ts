@@ -1,6 +1,7 @@
 import express from "express";
 import * as announcementService from "../services/announcementService";
 import * as teacherService from "../services/teacherService";
+import * as studentService from "../services/studentService";
 import * as authMiddleware from "../middlewares/authMiddleware";
 import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import multer from "multer";
@@ -85,5 +86,54 @@ router.post(
     }
   }
 );
+
+// Route for getting the latest announcement by teacher (student only)
+router.get(
+  "/latest",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  async (req, res) => {
+    const student = await studentService.findStudentByUserId(req.body.user.id);
+    if (!student) {
+      res.status(404).send("Student not found");
+      return;
+    }
+    if (!student.teacherId) {
+      res.status(404).send("Teacher not found");
+      return;
+    }
+    const teacherId = student.teacherId;
+    try {
+      const announcement =
+        await announcementService.getLatestAnnouncementByTeacherId(teacherId);
+      res.json(announcement);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal server error");
+    } finally {
+      console.log(`Request completed with teacherId: ${teacherId}`);
+    }
+  }
+);
+
+router.get("/teacher/:teacherId",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  async (req, res) => {
+  const teacherId = parseInt(req.params.teacherId);
+  if (!teacherId) {
+    res.status(400).send("Teacher ID is required");
+    return;
+  }
+  try {
+    const announcements = await announcementService.getAnnouncementsForStudent(
+      teacherId
+    );
+    res.json(announcements);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal server error");
+  }
+});
 
 export default router;

@@ -119,7 +119,7 @@ model Appointment {
   content       String?
   requestedTime DateTime
   finalTime     DateTime?
-  status        String    @default("PENDING") // or RESCHEDULED, CONFIMRED, CANCELLED
+  status        String    @default("รอการตอบรับจากอาจารย์") // "รอการตอบรับจากอาจารย์" or "ยอมรับโดยอาจารย์" or "เสนอเวลานัดหมายใหม่" or "ยืนยันการนัดหมาย" or "ยกเลิกโดยอาจารย์" or "ยกเลิกโดยนักศึกษา"
   isAccepted    Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

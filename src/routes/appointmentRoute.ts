@@ -7,41 +7,45 @@ import * as permissionMiddleware from "../middlewares/permissionMiddleware";
 import { UserRole } from "../models/user";
 const router = express.Router();
 
-// Route for getting all appointments with pagination (admin only)
-router.get(
-  "/all",
-  authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission([UserRole.ADMIN]),
-  async (req, res) => {
-    const pageSize = parseInt(req.query.pageSize as string) || 3;
-    const pageNo = parseInt(req.query.pageNo as string) || 1;
 
-    if (pageNo < 1 || pageSize < 1) {
-      res.status(400).send("Invalid page number or page size");
-      return;
-    }
-
-    try {
-      const result = await appointmentService.getAllAppointmentsPagination(
-        pageNo,
-        pageSize
-      );
-      if (result.appointments.length === 0) {
-        res.status(404).send("No appointment found");
-        return;
-      }
-      res.setHeader("x-total-count", result.count.toString());
-      res.setHeader("Access-Control-Expose-Headers", "x-total-count");
-      res.json(result.appointments);
-    } catch (error) {
-      res.status(500).send("Internal server error");
-    } finally {
-      console.log(
-        `Request completed with pageNo: ${pageNo}, pageSize: ${pageSize}`
-      );
-    }
+router.get("/all", authMiddleware.jwtVerify, async (req, res) => {
+  try {
+    const appointments = await appointmentService.getAllAppointments();
+    res.json(appointments);
   }
-);
+  catch (error) {
+    res.status(500).send("Internal server error");
+  }
+});
+
+
+// Route for getting all appointments for a student (student only)
+router.get('/student/:id', authMiddleware.jwtVerify, permissionMiddleware.checkPermission([UserRole.STUDENT]), async (req, res) => {
+  const studentId = req.params.id;
+  try {
+    const appointments = await appointmentService.getAppointmentsByStudentId(studentId);
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).send('Internal server error');
+  } finally {
+    console.log(`Request completed with studentId: ${studentId}`);
+  }
+});
+
+
+// Route for getting all appointments for a teacher (teacher only)
+router.get('/teacher/:id', authMiddleware.jwtVerify, permissionMiddleware.checkPermission([UserRole.TEACHER]), async (req, res) => {
+  const teacherId = parseInt(req.params.id);
+  try {
+    const appointments = await appointmentService.getAppointmentsByTeacherId(teacherId);
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).send('Internal server error');
+  } finally {
+    console.log(`Request completed with teacherId: ${teacherId}`);
+  }
+});
+
 
 // Route for confirming an appointment (teacher only)
 router.put(
@@ -66,7 +70,7 @@ router.put(
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CONFIRMED"
+          "ยอมรับโดยอาจารย์"
         );
       res.json({ updatedAppointment, updateFinalTime });
     } catch (error) {
@@ -98,31 +102,11 @@ router.put(
       );
       const updatedStatus = await appointmentService.updateAppointmentStatus(
         parseInt(id),
-        "RESCHEDULED"
+        "เสนอเวลานัดหมายใหม่"
       );
-      res.json({ updatedStatus, updatedAppointment });
+      res.json({ updatedStatus });
     } catch (error) {
       res.status(500).json({ error: "Failed to reschedule appointment" });
-    }
-  }
-);
-
-// Route for canceling an appointment (teacher only)
-router.put(
-  "/:id/teacher-cancel",
-  authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission([UserRole.TEACHER]),
-  async (req, res) => {
-    const { id } = req.params;
-    try {
-      const updatedAppointment =
-        await appointmentService.updateAppointmentStatus(
-          parseInt(id),
-          "CANCELED"
-        );
-      res.json(updatedAppointment);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to cancel appointment" });
     }
   }
 );
@@ -177,7 +161,7 @@ router.put(
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CONFIRMED"
+          "ยืนยันการนัดหมาย"
         );
       const confirmedAppointment = await appointmentService.confirmAppointment(
         parseInt(id)
@@ -191,24 +175,44 @@ router.put(
   }
 );
 
-// Route for canceling an appointment (student only)
+// Route for canceling an appointment (student and teacher only)
 router.put(
-  "/:id/student-cancel",
+  "/:id/cancel",
   authMiddleware.jwtVerify,
-  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  permissionMiddleware.checkPermission([UserRole.STUDENT, UserRole.TEACHER]),
   async (req, res) => {
     const { id } = req.params;
+    const { role } = req.body.user;
+    if (role === UserRole.STUDENT) {
     try {
       const updatedAppointment =
         await appointmentService.updateAppointmentStatus(
           parseInt(id),
-          "CANCELED"
+          "ยกเลิกโดยนักศึกษา"
         );
       res.json(updatedAppointment);
     } catch (error) {
       res.status(500).json({ error: "Failed to cancel appointment" });
     }
+    return;
   }
+
+  else if (role === UserRole.TEACHER) {
+    try {
+      const updatedAppointment =
+        await appointmentService.updateAppointmentStatus(
+          parseInt(id),
+          "ยกเลิกโดยอาจารย์"
+        );
+      res.json(updatedAppointment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel appointment" });
+    }
+    return;
+  }
+}
+
+  
 );
 
 export default router;

@@ -2,20 +2,91 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Function to get all appointments with pagination (admin only)
-export async function getAllAppointmentsPagination(
-  pageNo: number,
-  pageSize: number
-) {
+export async function getAllAppointments() {
   const appointments = await prisma.appointment.findMany({
-    skip: pageSize * (pageNo - 1),
-    take: pageSize,
     select: {
       id: true,
+      title: true,
+      content: true,
       requestedTime: true,
       finalTime: true,
       status: true,
       isAccepted: true,
+      student: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+
+          department: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+          department: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Group appointments by status
+  const groupedAppointments = {
+    APPOINTMENT_CONFIRMED: appointments.filter(
+      (appointment) => appointment.status === "ยืนยันการนัดหมาย"
+    ),
+    AWAITING_RESPONSE: appointments.filter(
+      (appointment) => appointment.status === "รอการตอบรับจากอาจารย์"
+    ),
+    NEW_DATE_PURPOSED: appointments.filter(
+      (appointment) => appointment.status === "เสนอเวลานัดหมายใหม่"
+    ),
+    ACCEPTED_BY_TEACHER: appointments.filter(
+      (appointment) => appointment.status === "ยอมรับโดยอาจารย์"
+    ),
+    CANCELLED_BY_TEACHER: appointments.filter(
+      (appointment) => appointment.status === "ยกเลิกโดยอาจารย์"
+    ),
+    CANCELLED_BY_STUDENT: appointments.filter(
+      (appointment) => appointment.status === "ยกเลิกโดยนักศึกษา"
+    ),
+  };
+
+  return groupedAppointments;
+}
+
+export async function getAppointmentsByStudentId(studentId: string) {
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      studentId: studentId,
+    },
+    orderBy: {
+      createdAt: "desc", // Sort appointments by createdAt in descending order (newest to oldest)
+    },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      requestedTime: true,
+      finalTime: true,
+      status: true,
+      isAccepted: true,
+      createdAt: true,
       student: {
         select: {
           id: true,
@@ -37,9 +108,55 @@ export async function getAllAppointmentsPagination(
       },
     },
   });
-  const count = await prisma.appointment.count();
 
-  return { appointments, count };
+  return appointments;
+}
+
+export async function getAppointmentsByTeacherId(teacherId: number) {
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      teacherId: teacherId,
+    },
+    orderBy: {
+      createdAt: "desc", // Sort appointments by createdAt in descending order (newest to oldest)
+    },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      requestedTime: true,
+      finalTime: true,
+      status: true,
+      isAccepted: true,
+      createdAt: true,
+      student: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          user: {
+            select: {
+              profile: true,
+            },
+          },
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          academicPosition: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return appointments;
 }
 
 export async function updateAppointmentStatus(
@@ -112,7 +229,6 @@ export async function addAppointment(
 
   return appointment;
 }
-
 
 // Function to confirm an appointment (student only)
 export async function confirmAppointment(appointmentId: number) {

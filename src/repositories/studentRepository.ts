@@ -48,6 +48,9 @@ export async function getAllStudentsPagination(
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   const count = await prisma.student.count({ where });
   return { students, count };
@@ -106,6 +109,7 @@ export async function findStudentByUserId(userId: number) {
           name: true,
         },
       },
+      teacherId: true,
     },
   });
   return student;
