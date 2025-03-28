@@ -95,4 +95,5 @@ export async function createAppointments() {
     });
     console.log(`✅ Created appointment: ${appointment.title}`);
   }
+
 }
