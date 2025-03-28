@@ -24,3 +24,8 @@ export async function getLatestAnnouncementByTeacherId(teacherId: number) {
   const announcement = await repo.getLatestAnnouncementByTeacherId(teacherId);
   return announcement;
 }
+
+export async function getAnnouncementsForStudent(teacherId: number) {
+  const announcements = await repo.getAnnouncementsForStudent(teacherId);
+  return announcements;
+}

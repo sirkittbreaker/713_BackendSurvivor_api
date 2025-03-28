@@ -116,4 +116,24 @@ router.get(
   }
 );
 
+router.get("/teacher/:teacherId",
+  authMiddleware.jwtVerify,
+  permissionMiddleware.checkPermission([UserRole.STUDENT]),
+  async (req, res) => {
+  const teacherId = parseInt(req.params.teacherId);
+  if (!teacherId) {
+    res.status(400).send("Teacher ID is required");
+    return;
+  }
+  try {
+    const announcements = await announcementService.getAnnouncementsForStudent(
+      teacherId
+    );
+    res.json(announcements);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 export default router;

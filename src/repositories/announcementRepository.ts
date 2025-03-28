@@ -55,3 +55,16 @@ export async function getLatestAnnouncementByTeacherId(teacherId: number) {
 
   return announcement;
 }
+
+export async function getAnnouncementsForStudent(teacherId: number) {
+  const announcements = await prisma.announcement.findMany({
+    where: {
+      teacherId: teacherId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return announcements;
+}
