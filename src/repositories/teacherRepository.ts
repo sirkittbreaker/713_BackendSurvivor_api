@@ -116,7 +116,6 @@ export async function getTeacherByStudentId(studentId: string) {
   return teacher;
 }
 
-
 export async function getTeacherByDepartmentId(departmentId: number) {
   const teachers = await prisma.teacher.findMany({
     where: {
