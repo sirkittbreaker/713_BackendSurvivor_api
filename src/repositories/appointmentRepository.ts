@@ -47,17 +47,17 @@ export async function getAllAppointments() {
 
   // Group appointments by status
   const groupedAppointments = {
+    APPOINTMENT_CONFIRMED: appointments.filter(
+      (appointment) => appointment.status === "ยืนยันการนัดหมาย"
+    ),
     AWAITING_RESPONSE: appointments.filter(
       (appointment) => appointment.status === "รอการตอบรับจากอาจารย์"
-    ),
-    ACCEPTED_BY_TEACHER: appointments.filter(
-      (appointment) => appointment.status === "ยอมรับโดยอาจารย์"
     ),
     NEW_DATE_PURPOSED: appointments.filter(
       (appointment) => appointment.status === "เสนอเวลานัดหมายใหม่"
     ),
-    APPOINTMENT_CONFIRMED: appointments.filter(
-      (appointment) => appointment.status === "ยืนยันการนัดหมาย"
+    ACCEPTED_BY_TEACHER: appointments.filter(
+      (appointment) => appointment.status === "ยอมรับโดยอาจารย์"
     ),
     CANCELLED_BY_TEACHER: appointments.filter(
       (appointment) => appointment.status === "ยกเลิกโดยอาจารย์"
