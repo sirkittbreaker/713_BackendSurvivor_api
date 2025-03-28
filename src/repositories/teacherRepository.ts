@@ -53,7 +53,7 @@ export async function getAllTeachersPagination(
           },
         },
         orderBy: {
-          id: "asc",
+          createdAt: "desc",
         },
       },
     },
@@ -130,7 +130,6 @@ export async function getTeacherByStudentId(studentId: string) {
   });
   return teacher;
 }
-
 
 export async function getTeacherByDepartmentId(departmentId: number) {
   const teachers = await prisma.teacher.findMany({

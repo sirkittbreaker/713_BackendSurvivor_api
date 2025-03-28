@@ -8,11 +8,11 @@ export async function getAllStudentsPagination(
   pageNo: number,
   pageSize: number
 ) {
-  const where = {
+  const where: any = {
     OR: [
-      { studentId: { contains: keyword } },
-      { firstName: { contains: keyword } },
-      { lastName: { contains: keyword } },
+      { studentId: { contains: keyword, mode: "insensitive" } },
+      { firstName: { contains: keyword, mode: "insensitive" } },
+      { lastName: { contains: keyword, mode: "insensitive" } },
     ],
   };
   const students = await prisma.student.findMany({
@@ -47,6 +47,9 @@ export async function getAllStudentsPagination(
           },
         },
       },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
   const count = await prisma.student.count({ where });
