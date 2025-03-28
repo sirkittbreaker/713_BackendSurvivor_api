@@ -26,13 +26,13 @@ router.get(
         pageNo,
         pageSize
       );
-      if (result.teachers.data.length === 0) {
+      if (result.teachers.length === 0) {
         res.status(404).send("No teacher found");
         return;
       }
-      res.setHeader("x-total-count", result.teachers.total.toString());
+      res.setHeader("x-total-count", result.count.toString());
       res.setHeader("Access-Control-Expose-Headers", "x-total-count");
-      res.json(result.teachers.data);
+      res.json(result.teachers);
     } catch (error) {
       res.status(500).send("Internal server error");
     } finally {

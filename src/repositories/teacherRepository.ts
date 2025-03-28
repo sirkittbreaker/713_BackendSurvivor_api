@@ -52,30 +52,15 @@ export async function getAllTeachersPagination(
             },
           },
         },
-        orderBy: {
-          createdAt: "desc",
-        },
       },
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
   const count = await prisma.teacher.count();
-
-  const teachersWithAppointments = teachers.map((teacher) => {
-    return {
-      ...teacher,
-      TotalAppointments: {
-        accepted: teacher.Appointment.filter((appt) => appt.isAccepted),
-        pending: teacher.Appointment.filter((appt) => !appt.isAccepted),
-      },
-    };
-  });
-
-  return {
-    teachers: {
-      total: count,
-      data: teachersWithAppointments,
-    },
-  };
+console.log(teachers);
+ return { teachers, count };
 }
 
 export async function findTeacherByUserId(userId: number) {
