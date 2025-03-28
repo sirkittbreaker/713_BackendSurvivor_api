@@ -7,6 +7,9 @@ export async function getAllAnnouncementsByTeacherId(teacherId: number) {
     where: {
       teacherId: teacherId,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return announcements;
