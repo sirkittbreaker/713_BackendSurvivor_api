@@ -143,6 +143,12 @@ router.post(
       res.status(400).json({ message: "All fields are required" });
       return;
     }
+    // Check if the user already exists
+    const existingUser = await authService.findUserByUsername(username);
+    if (existingUser) {
+      res.status(409).json({ message: "Username already exists" });
+      return;
+    }
     try {
       let profileUrl: string | undefined;
 
@@ -186,6 +192,12 @@ router.post("/register-student", upload.single("profile"), async (req, res) => {
   const { username, password, firstName, lastName, departmentId } = req.body;
   if (!username || !password || !firstName || !lastName || !departmentId) {
     res.status(400).json({ message: "All fields are required" });
+    return;
+  }
+  // Check if the user already exists
+  const existingUser = await authService.findUserByUsername(username);
+  if (existingUser) {
+    res.status(409).json({ message: "Username already exists" });
     return;
   }
   try {
