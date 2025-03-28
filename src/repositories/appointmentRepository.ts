@@ -17,6 +17,12 @@ export async function getAllAppointments() {
           id: true,
           firstName: true,
           lastName: true,
+
+          department: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
       teacher: {
@@ -29,6 +35,11 @@ export async function getAllAppointments() {
               title: true,
             },
           },
+          department: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
     },
@@ -36,12 +47,24 @@ export async function getAllAppointments() {
 
   // Group appointments by status
   const groupedAppointments = {
-    AWAITING_RESPONSE: appointments.filter((appointment) => appointment.status === 'รอการตอบรับจากอาจารย์'),
-    ACCEPTED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยอมรับโดยอาจารย์'),
-    NEW_DATE_PURPOSED: appointments.filter((appointment) => appointment.status === 'เสนอเวลานัดหมายใหม่'),
-    APPOINTMENT_CONFIRMED: appointments.filter((appointment) => appointment.status === 'ยืนยันการนัดหมาย'),
-    CANCELLED_BY_TEACHER: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยอาจารย์'),
-    CANCELLED_BY_STUDENT: appointments.filter((appointment) => appointment.status === 'ยกเลิกโดยนักศึกษา'),
+    AWAITING_RESPONSE: appointments.filter(
+      (appointment) => appointment.status === "รอการตอบรับจากอาจารย์"
+    ),
+    ACCEPTED_BY_TEACHER: appointments.filter(
+      (appointment) => appointment.status === "ยอมรับโดยอาจารย์"
+    ),
+    NEW_DATE_PURPOSED: appointments.filter(
+      (appointment) => appointment.status === "เสนอเวลานัดหมายใหม่"
+    ),
+    APPOINTMENT_CONFIRMED: appointments.filter(
+      (appointment) => appointment.status === "ยืนยันการนัดหมาย"
+    ),
+    CANCELLED_BY_TEACHER: appointments.filter(
+      (appointment) => appointment.status === "ยกเลิกโดยอาจารย์"
+    ),
+    CANCELLED_BY_STUDENT: appointments.filter(
+      (appointment) => appointment.status === "ยกเลิกโดยนักศึกษา"
+    ),
   };
 
   return groupedAppointments;
@@ -53,7 +76,7 @@ export async function getAppointmentsByStudentId(studentId: string) {
       studentId: studentId,
     },
     orderBy: {
-      createdAt: 'desc', // Sort appointments by createdAt in descending order (newest to oldest)
+      createdAt: "desc", // Sort appointments by createdAt in descending order (newest to oldest)
     },
     select: {
       id: true,
@@ -89,15 +112,13 @@ export async function getAppointmentsByStudentId(studentId: string) {
   return appointments;
 }
 
-
-
 export async function getAppointmentsByTeacherId(teacherId: number) {
   const appointments = await prisma.appointment.findMany({
     where: {
       teacherId: teacherId,
     },
     orderBy: {
-      createdAt: 'desc', // Sort appointments by createdAt in descending order (newest to oldest)
+      createdAt: "desc", // Sort appointments by createdAt in descending order (newest to oldest)
     },
     select: {
       id: true,
@@ -115,9 +136,9 @@ export async function getAppointmentsByTeacherId(teacherId: number) {
           lastName: true,
           user: {
             select: {
-              profile: true
+              profile: true,
             },
-          }
+          },
         },
       },
       teacher: {
@@ -137,7 +158,6 @@ export async function getAppointmentsByTeacherId(teacherId: number) {
 
   return appointments;
 }
-
 
 export async function updateAppointmentStatus(
   appointmentId: number,
@@ -210,7 +230,6 @@ export async function addAppointment(
   return appointment;
 }
 
-
 // Function to confirm an appointment (student only)
 export async function confirmAppointment(appointmentId: number) {
   const appointment = await prisma.appointment.update({
@@ -224,5 +243,3 @@ export async function confirmAppointment(appointmentId: number) {
 
   return appointment;
 }
-
-
