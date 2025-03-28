@@ -3,6 +3,8 @@ import { createAcademicPositions } from "./db/createAcademicPosition";
 import { createDepartments } from "./db/createDepartment";
 import { createUser } from "./db/createUser";
 import { createAppointments } from "./db/createAppointment";
+import { createComments } from "./db/createComment";
+import { createAnnouncements } from "./db/createAnnouncement";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +13,8 @@ async function main() {
   await createDepartments();
   await createUser();
   await createAppointments();
+  await createComments();
+  await createAnnouncements();
 }
 
 main()
